@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: ./backend
+    container_name: task_manager_backend
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URL: mongodb://mongodb:27017
+      DATABASE_NAME: task_manager
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    container_name: task_manager_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    container_name: task_manager_frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
